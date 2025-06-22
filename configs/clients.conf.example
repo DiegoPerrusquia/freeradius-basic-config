@@ -1,0 +1,20 @@
+# Configuración de clientes para FreeRADIUS
+# Cada bloque 'client' define un dispositivo (por ejemplo, un AP Wi-Fi o un servidor VPN)
+# que tiene permitido comunicarse con el servidor RADIUS
+
+client mi_ap_wifi {
+    ipaddr = 192.168.16.10         # Dirección IP del cliente autorizado (AP Wi-Fi)
+    secret = wifi1234              # Clave compartida entre este cliente y el servidor RADIUS
+    # Protege la comunicación y asegura que el cliente es legítimo
+    shortname = AP_WIFI            # Nombre corto opcional. Se muestra en los logs para identificar el cliente
+}
+
+client mi_vpn {
+    ipaddr = 192.168.16.20         # Dirección IP de otro cliente autorizado (servidor VPN)
+    secret = vpnsecret987          # Clave compartida única para este cliente
+    shortname = VPN_SERVER         # Alias opcional para identificar este cliente en los registros
+}
+
+# Recomendación: 
+# - Usa un secret diferente y fuerte para cada cliente.
+# - Limita el acceso a IPs específicas; no uses rangos amplios.

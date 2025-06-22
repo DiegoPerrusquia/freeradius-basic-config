@@ -1,0 +1,68 @@
+###############################################################################
+# FreeRADIUS: Ejemplo de usuarios locales con distintos métodos de autenticación
+# Este archivo muestra cómo definir usuarios y contraseñas con varios métodos.
+# IMPORTANTE:
+#   - FreeRADIUS no genera ni cifra automáticamente las contraseñas aquí.
+#   - Lo que escribes debe ser el valor correcto (texto claro o hash adecuado).
+#   - El tipo de atributo que uses determina cómo FreeRADIUS verifica al usuario.
+###############################################################################
+
+# ==========================================
+# 1 leartext-Password
+# ------------------------------------------
+# Contraseña en texto claro. FreeRADIUS la compara directamente con lo ingresado.
+# Usado solo para laboratorios o pruebas. NO recomendado en producción.
+# No necesitas generar nada: escribe directamente la contraseña.
+jose Cleartext-Password := "clave123"
+# Cuando 'jose' se autentica, FreeRADIUS verifica que la contraseña ingresada sea exactamente "clave123".
+
+# ==========================================
+# 2 Crypt-Password (hash tipo Unix, ejemplo SHA-512)
+# ------------------------------------------
+# Contraseña almacenada como hash. FreeRADIUS calcula el hash de la contraseña ingresada
+# y lo compara con el que tú escribiste.
+# Debes generar el hash antes de colocarlo aquí.
+# Comando para generar el hash:
+#   mkpasswd --method=SHA-512
+#   o
+#   openssl passwd -6
+ana Crypt-Password := "$6$rounds=5000$EjemploDeHashGenerado$Qm9rb1d...etc..."
+# Sustituye el valor por el hash real que generes para la contraseña de 'ana'.
+
+# ==========================================
+# 3 MD5-Password
+# ------------------------------------------
+# Contraseña almacenada como hash MD5.
+# Método obsoleto. Solo para compatibilidad con sistemas antiguos.
+# Genera el hash con:
+#   echo -n 'tu_clave' | md5sum | awk '{print $1}'
+carlos MD5-Password := "098f6bcd4621d373cade4e832627b4f6"
+# Este es el hash MD5 de "test". No recomendado para producción.
+
+# ==========================================
+# 4 NT-Password (para MS-CHAPv2)
+# ------------------------------------------
+# Contraseña como NT hash. Necesario para redes que usan MS-CHAPv2 (ej: VPNs, Wi-Fi corporativo).
+# Genera el NT hash con:
+#   echo -n 'tu_clave' | iconv -t utf16le | openssl md4
+david NT-Password := "8846f7eaee8fb117ad06bdd830b7586c"
+# Este es el NT hash de "password". Cambia por el hash de tu clave real.
+
+# ==========================================
+# 5 LDAP / AD / Base de datos (autenticación externa)
+# ------------------------------------------
+# En este caso no defines contraseñas en este archivo.
+# FreeRADIUS consulta un servidor externo.
+DEFAULT Auth-Type := LDAP
+# Esto indica que el servidor debe usar el módulo LDAP configurado.
+
+###############################################################################
+# RESUMEN IMPORTANTE:
+# - Tú eres responsable de escribir el valor adecuado (texto o hash) según el método.
+# - FreeRADIUS NO convierte ni cifra automáticamente la contraseña por el tipo de atributo.
+# - El cliente y el protocolo elegido determinan si la contraseña viaja cifrada en la red.
+# - Para producción usa NT-Password, LDAP/AD o EAP con certificados. Evita Cleartext y MD5.
+# - Siempre reinicia el servicio tras modificar este archivo:
+sudo systemctl restart freeradius
+###############################################################################
+
